@@ -1,5 +1,6 @@
 from flask import Flask, request, abort
 import psycopg2
+import json
 app = Flask(__name__)
 
 @app.route('/')
@@ -8,7 +9,10 @@ def index():
 
 @app.route('/getChat', methods=['GET'])
 def get_chat():
-    return "All messages"
+    cur = con.cursor()
+    cur.execute("SELECT name,message from chat")
+    messages=cur.fetchall()
+    return dict(messages)
 
 @app.route('/sendMessage', methods=['POST'])
 def send_message():
