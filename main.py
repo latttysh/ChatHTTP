@@ -1,16 +1,47 @@
-# This is a sample Python script.
+from flask import Flask, request, abort
+import psycopg2
+app = Flask(__name__)
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+@app.route('/')
+def index():
+    return "Hello, World!"
 
+@app.route('/getChat', methods=['GET'])
+def get_chat():
+    return "All messages"
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+@app.route('/sendMessage', methods=['POST'])
+def send_message():
+    a = len(request.args)
+    if len(request.args) == 0:
+        return "Запрос пустой"
+    name1 = request.args.get("name")
+    message1 = request.args.get("message")
+    cur = con.cursor()
+    cur.execute(
+        f"INSERT INTO CHAT (name,message) VALUES ('{name1}','{message1}')"
+    )
 
+    con.commit()
+    return "Record inserted successfully"
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    con = psycopg2.connect(
+        database="HttpChat",
+        user="postgres",
+        password="root",
+        host="127.0.0.1",
+        port="5432"
+    )
+    # cur = con.cursor()
+    # cur.execute('''CREATE TABLE CHAT
+    #      (ID SERIAL,
+    #      NAME TEXT NOT NULL,
+    #      MESSAGE TEXT NOT NULL)''')
+    #
+    # print("Table created successfully")
+    # con.commit()
+    # con.close()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    print("Database opened successfully")
+    app.run(debug=True)
