@@ -1,6 +1,7 @@
-from flask import Flask, request, abort
-import psycopg2
 import json
+import itertools
+from flask import Flask, request, abort,jsonify, Response
+import psycopg2
 app = Flask(__name__)
 
 @app.route('/')
@@ -12,7 +13,9 @@ def get_chat():
     cur = con.cursor()
     cur.execute("SELECT name,message from chat")
     messages=cur.fetchall()
-    return dict(messages)
+    res = json.dumps(messages, sort_keys=False, indent=4,ensure_ascii=False, separators=(',',':'))
+    # res = list(itertools.chain(*messages))
+    return res
 
 @app.route('/sendMessage', methods=['POST'])
 def send_message():
